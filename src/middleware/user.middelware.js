@@ -1,19 +1,47 @@
 const db = require('../models')
-const jwt = require('jsonwebtoken')
 const User = db.user
+
+const checkUserExist = async (req, res, next) => {
+    try {
+        const id = res.locals.token
+        const email = await User.findOne({email: req.body.user.email})
+        const username = await User.findOne({
+            username: req.body.user.username,
+        })
+        if (id) {
+            const user = await User.findById(id)
+            if (user) {
+                if (id !== (username._id.toString() || email._id.toString())) {
+                    res.status(400).send({
+                        error: `Failed, ${username ? 'username' : 'email'} already exists`,
+                    })
+                    return
+                }
+            }
+        } else if (email || username) {
+            res.status(409).send({
+                message: `Failed, ${username ? 'username' : 'email'} already exists`,
+            })
+            return
+        }
+        next()
+    } catch (err) {
+        console.error(err)
+        res.status(500).send({error: err})
+    }
+}
 
 const checkUserUpdateExist = async (req, res, next) => {
     try {
-        let token = req.headers['x-access-token']
-        let decoded = jwt.verify(token, process.env.JWT_SECRET)
-        let user = await User.findById(decoded.id)
+        const id = res.locals.token
+        const user = await User.findById(id)
         if (user) {
-            let email = await User.findOne({email: req.body.user.email})
-            let username = await User.findOne({
+            const email = await User.findOne({email: req.body.user.email})
+            const username = await User.findOne({
                 username: req.body.user.username,
             })
             if (email) {
-                if (decoded.id !== email._id.toString()) {
+                if (id !== email._id.toString()) {
                     res.status(400).send({
                         error: 'Failed, email already exists',
                     })
@@ -21,7 +49,7 @@ const checkUserUpdateExist = async (req, res, next) => {
                 }
             }
             if (username) {
-                if (decoded.id !== username._id.toString()) {
+                if (id !== username._id.toString()) {
                     res.status(400).send({
                         error: 'Failed, username already exists',
                     })
@@ -36,4 +64,4 @@ const checkUserUpdateExist = async (req, res, next) => {
     }
 }
 
-module.exports = {checkUserUpdateExist}
+module.exports = {checkUserUpdateExist, checkUserExist}

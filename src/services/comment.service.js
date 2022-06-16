@@ -1,63 +1,49 @@
-const db = require('../models')
-const Comment = db.comments
+const {
+    findManyComments,
+    findOneCommentAndDelete,
+    createNewComment,
+} = require('../repositories/comment.repository')
+const {findOneUser} = require('../repositories/user.repository')
 
-const updateManyComments = async (query, update, options) => {
+const getCommentsService = async (slug) => {
     try {
-        return await Comment.updateMany(query, update, options)
+        const comments = await findManyComments({slug: slug}, {_id: 0, slug: 0, __v: 0})
+        return {comments: comments}
+    } catch (err) {
+        return err
+    }
+}
+const deleteCommentService = async (slug, id) => {
+    try {
+        await findOneCommentAndDelete({
+            slug: slug,
+            id: id,
+        })
+        return {message: 'Comment was deleted successfuly'}
     } catch (err) {
         return err
     }
 }
 
-const findManyComments = async (query, options) => {
+const createCommentService = async (slug, body, id) => {
     try {
-        return await Comment.find(query, options)
-    } catch (err) {
-        return err
-    }
-}
-
-const findOneComment = async (query, options) => {
-    try {
-        return await Comment.findOne(query, options)
-    } catch (err) {
-        return err
-    }
-}
-
-const findOneCommentAndDelete = async (query, options) => {
-    try {
-        return await Comment.findOneAndDelete(query, options)
-    } catch (err) {
-        return err
-    }
-}
-
-const createNewComment = async (slug, body, user) => {
-    try {
-        let comment = await await new Comment({
+        const user = await findOneUser({_id: id})
+        const comment = await createNewComment({
             id: null,
             slug: slug,
             body: body,
             createdAt: new Date().toISOString(),
-        }).save()
-        comment.id = comment._id
-        comment.author = {
-            username: user.username,
-            bio: user.bio,
-            image: user.image,
-            following: user.following,
-        }
-        return await comment.save()
+            author: {
+                username: user.username,
+                bio: user.bio,
+                image: user.image,
+                following: user.following,
+            },
+        })
+        return comment
     } catch (err) {
         return err
     }
 }
 
-module.exports = {
-    updateManyComments,
-    findManyComments,
-    findOneComment,
-    findOneCommentAndDelete,
-    createNewComment,
-}
+module.exports = {getCommentsService, deleteCommentService, createCommentService}

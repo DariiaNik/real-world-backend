@@ -1,31 +1,13 @@
-const db = require('../models')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const {findOneUser} = require('../services/user.service')
-const User = db.user
+const {findOneUser} = require('../repositories/user.repository')
+const {registerNewUserService} = require('../services/auth.service')
 
 const registerNewUser = async (req, res) => {
     try {
-        let user = await new User({
-            username: req.body.user.username,
-            email: req.body.user.email,
-            password: bcrypt.hashSync(req.body.user.password, 8),
-            image: 'https://pic.onlinewebfonts.com/svg/img_550783.png',
-            bio: '',
-            following: false,
-        }).save()
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {
-            expiresIn: 3600,
-        })
-        res.status(200).send({
-            user: {
-                username: user.username,
-                email: user.email,
-                image: user.image,
-                bio: user.bio,
-                token: token,
-            },
-        })
+        const reqUser = req.body.user
+        const user = await registerNewUserService(reqUser)
+        res.status(200).send(user)
     } catch (err) {
         console.error(err)
         res.status(500).send({error: err})
@@ -34,7 +16,7 @@ const registerNewUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        let user = await findOneUser({email: req.body.user.email})
+        const user = await findOneUser({email: req.body.user.email})
         if (!user) {
             res.status(404).send({
                 accessToken: null,

@@ -27,11 +27,12 @@ Install dependencies
   npm install
 ```
 
+Create .env file in the project root. Fill in according to the .env-example
+
 Start the server
 
 ```bash
-  cd src
-  node app.js
+  npm start
 ```
 
 ## Documentation

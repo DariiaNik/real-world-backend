@@ -2,13 +2,14 @@ const jwt = require('jsonwebtoken')
 
 const verifyToken = async (req, res, next) => {
     try {
-        let token = req.headers['x-access-token']
+        const token = req.headers['x-access-token']
         if (!token) {
             return res.status(403).send({error: 'No token provider'})
         }
-        jwt.verify(token, process.env.JWT_SECRET, {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET, {
             expiresIn: 6000,
         })
+        res.locals.token = decoded.id
     } catch (err) {
         console.error(err)
         res.status(401).send({error: 'Unauthorize'})

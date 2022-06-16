@@ -1,70 +1,100 @@
-const db = require('../models')
-const Article = db.article
+const {findOneUser} = require('../repositories/user.repository')
+const {
+    createNewArticle,
+    getAllTags,
+    findManyArticles,
+    CountArticles,
+    findOneArticlebySlug,
+    findOneArticleAndDelete,
+    findOneArticleAndUpdate,
+} = require('../repositories/article.repository')
 
-const findOneArticlebySlug = async (query, options) => {
+const getAllArticlesService = async (id, reqQuery) => {
     try {
-        return await Article.findOne(query, options)
+        const query = {}
+        if (reqQuery.tag && reqQuery.tag.length > 1) {
+            query.tagList = {$in: reqQuery.tag}
+        }
+        if (reqQuery.author && reqQuery.author.length > 1) {
+            query['author.username'] = reqQuery.author
+        }
+        if (reqQuery.favorited && reqQuery.favorited.length > 1) {
+            const user = await findOneUser({username: reqQuery.favorited})
+            query.favoritedBy = user._id.toString()
+        }
+
+        const articles = await findManyArticles(query, {_id: 0, __v: 0}, reqQuery)
+        const count = await CountArticles(query)
+        const result = articles.map((item) => ({
+            ...item._doc,
+            favorited: item.favoritedBy.includes(id),
+        }))
+        return {
+            articles: result,
+            articlesCount: count,
+        }
     } catch (err) {
         return err
     }
 }
-
-const findManyArticles = async (query, options, reqQuery) => {
+const getArticleBySlugService = async (slug, id) => {
     try {
-        return await Article.find(query, options).skip(reqQuery.offset).limit(reqQuery.limit)
+        const article = await findOneArticlebySlug({slug: slug}, {_id: 0, __v: 0})
+        const user = await findOneUser({username: article.author.username})
+        return {
+            article: {
+                slug: article.slug,
+                title: article.title,
+                description: article.description,
+                body: article.body,
+                tagList: article.tagList,
+                createdAt: article.createdAt,
+                updatedAt: article.updatedAt,
+                favorited: article.favoritedBy.includes(id),
+                favoritesCount: article.favoritesCount,
+                author: {
+                    username: user.username,
+                    bio: user.bio,
+                    image: user.image,
+                    following: user.followingBy.includes(id),
+                },
+            },
+        }
     } catch (err) {
         return err
     }
 }
-
-const CountArticles = async (query) => {
+const getFeedArticlesService = async (id, reqQuery) => {
     try {
-        return await Article.find(query).count()
+        const user = await findOneUser({
+            followingBy: {$in: id},
+        })
+        const query = {
+            'author.username': user.username,
+        }
+        const count = await CountArticles(query)
+        const articles = await findManyArticles(query, {_id: 0, __v: 0}, reqQuery)
+        const editArticles = articles.map((item) => ({
+            ...item._doc,
+            favorited: item.favoritedBy.includes(id),
+        }))
+        return {
+            articles: editArticles,
+            articlesCount: count,
+        }
     } catch (err) {
         return err
     }
 }
-
-const findOneArticleAndDelete = async (query, options) => {
+const createArticleService = async (id, reqArticle) => {
     try {
-        return await Article.findOneAndDelete(query, options)
-    } catch (err) {
-        return err
-    }
-}
-
-const findOneArticleAndUpdate = async (query, update, options) => {
-    try {
-        return await Article.findOneAndUpdate(query, update, options)
-    } catch (err) {
-        return err
-    }
-}
-
-const updateManyArticles = async (query, update, options) => {
-    try {
-        return await Article.updateMany(query, update, options)
-    } catch (err) {
-        return err
-    }
-}
-
-const getAllTags = async (query) => {
-    try {
-        return await Article.distinct(query)
-    } catch (err) {
-        return err
-    }
-}
-
-const createNewArticle = async (article, user) => {
-    try {
-        return await new Article({
-            slug: article.title.split(' ').join('-'),
-            title: article.title,
-            description: article.description,
-            body: article.body,
-            tagList: article.tagList,
+        const user = await findOneUser({_id: id})
+        const article = await createNewArticle({
+            slug: reqArticle.title.split(' ').join('-'),
+            title: reqArticle.title,
+            description: reqArticle.description,
+            body: reqArticle.body,
+            tagList: reqArticle.tagList,
             favorited: false,
             favoritedBy: [],
             favoritesCount: 0,
@@ -75,19 +105,140 @@ const createNewArticle = async (article, user) => {
                 bio: user.bio,
                 image: user.image,
             },
-        }).save()
+        })
+        return {
+            article: {
+                slug: article.slug,
+                title: article.title,
+                description: article.description,
+                body: article.body,
+                tagList: article.tagList,
+                createdAt: article.createdAt,
+                updatedAt: article.updatedAt,
+                favorited: article.favorited,
+                favoritesCount: article.favoritesCount,
+                author: article.author,
+            },
+        }
+    } catch (err) {
+        return err
+    }
+}
+const updateArticleService = async (slug, reqArticle) => {
+    try {
+        const article = await findOneArticleAndUpdate(
+            {slug: slug},
+            {
+                slug: reqArticle.title.split(' ').join('-'),
+                title: reqArticle.title,
+                description: reqArticle.description,
+                body: reqArticle.body,
+                tagList: reqArticle.tagList,
+                updatedAt: new Date().toISOString(),
+            },
+            {new: true}
+        )
+        return {
+            article: {
+                slug: article.slug,
+                title: article.title,
+                description: article.description,
+                body: article.body,
+                tagList: article.tagList,
+                createdAt: article.createdAt,
+                updatedAt: article.updatedAt,
+                favorited: article.favorited,
+                favoritesCount: article.favoritesCount,
+                author: article.author,
+            },
+        }
+    } catch (err) {
+        return err
+    }
+}
+const deleteArticleService = async (slug) => {
+    try {
+        await findOneArticleAndDelete({slug: slug})
+        return {message: 'Article was deleted successfuly'}
+    } catch (err) {
+        return err
+    }
+}
+const favoriteArticleService = async (slug, id) => {
+    try {
+        const article = await findOneArticleAndUpdate(
+            {slug: slug},
+            {
+                $push: {favoritedBy: id},
+                $inc: {favoritesCount: +1},
+            },
+            {new: true}
+        )
+        return {
+            article: {
+                slug: article.slug,
+                title: article.title,
+                description: article.description,
+                body: article.body,
+                tagList: article.tagList,
+                createdAt: article.createdAt,
+                updatedAt: article.updatedAt,
+                favorited: article.favoritedBy.includes(id),
+                favoritesCount: article.favoritesCount,
+                author: article.author,
+            },
+        }
+    } catch (err) {
+        return err
+    }
+}
+
+const unFavoriteArticleService = async (slug, id) => {
+    try {
+        const article = await findOneArticleAndUpdate(
+            {slug: slug},
+            {
+                $pull: {favoritedBy: id},
+                $inc: {favoritesCount: -1},
+            },
+            {new: true}
+        )
+        return {
+            article: {
+                slug: article.slug,
+                title: article.title,
+                description: article.description,
+                body: article.body,
+                tagList: article.tagList,
+                createdAt: article.createdAt,
+                updatedAt: article.updatedAt,
+                favorited: article.favoritedBy.includes(id),
+                favoritesCount: article.favoritesCount,
+                author: article.author,
+            },
+        }
+    } catch (err) {
+        return err
+    }
+}
+
+const getTagsService = async () => {
+    try {
+        const tags = await getAllTags('tagList')
+        return {tags}
     } catch (err) {
         return err
     }
 }
 
 module.exports = {
-    updateManyArticles,
-    findManyArticles,
-    findOneArticlebySlug,
-    CountArticles,
-    findOneArticleAndDelete,
-    findOneArticleAndUpdate,
-    getAllTags,
-    createNewArticle,
+    getAllArticlesService,
+    getArticleBySlugService,
+    getFeedArticlesService,
+    createArticleService,
+    deleteArticleService,
+    updateArticleService,
+    favoriteArticleService,
+    unFavoriteArticleService,
+    getTagsService,
 }
