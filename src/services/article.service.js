@@ -34,7 +34,7 @@ const getAllArticlesService = async (id, reqQuery) => {
             articlesCount: count,
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 const getArticleBySlugService = async (slug, id) => {
@@ -61,7 +61,7 @@ const getArticleBySlugService = async (slug, id) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 const getFeedArticlesService = async (id, reqQuery) => {
@@ -83,7 +83,7 @@ const getFeedArticlesService = async (id, reqQuery) => {
             articlesCount: count,
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 const createArticleService = async (id, reqArticle) => {
@@ -107,21 +107,10 @@ const createArticleService = async (id, reqArticle) => {
             },
         })
         return {
-            article: {
-                slug: article.slug,
-                title: article.title,
-                description: article.description,
-                body: article.body,
-                tagList: article.tagList,
-                createdAt: article.createdAt,
-                updatedAt: article.updatedAt,
-                favorited: article.favorited,
-                favoritesCount: article.favoritesCount,
-                author: article.author,
-            },
+            article: article,
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 const updateArticleService = async (slug, reqArticle) => {
@@ -153,7 +142,7 @@ const updateArticleService = async (slug, reqArticle) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 const deleteArticleService = async (slug) => {
@@ -161,7 +150,7 @@ const deleteArticleService = async (slug) => {
         await findOneArticleAndDelete({slug: slug})
         return {message: 'Article was deleted successfuly'}
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 const favoriteArticleService = async (slug, id) => {
@@ -189,7 +178,7 @@ const favoriteArticleService = async (slug, id) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 
@@ -218,7 +207,7 @@ const unFavoriteArticleService = async (slug, id) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 
@@ -227,7 +216,7 @@ const getTagsService = async () => {
         const tags = await getAllTags('tagList')
         return {tags}
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 

@@ -9,8 +9,7 @@ const registerNewUser = async (req, res) => {
         const user = await registerNewUserService(reqUser)
         res.status(200).send(user)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -45,8 +44,7 @@ const loginUser = async (req, res) => {
             },
         })
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 

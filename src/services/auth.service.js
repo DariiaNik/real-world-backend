@@ -25,7 +25,7 @@ const registerNewUserService = async (reqUser) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 

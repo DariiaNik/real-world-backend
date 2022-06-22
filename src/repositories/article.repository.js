@@ -59,7 +59,19 @@ const getAllTags = async (query) => {
 
 const createNewArticle = async (article) => {
     try {
-        return await new Article(article).save()
+        let newArticle = await new Article(article).save()
+        return {
+            slug: newArticle.slug,
+            title: newArticle.title,
+            description: newArticle.description,
+            body: newArticle.body,
+            tagList: newArticle.tagList,
+            createdAt: newArticle.createdAt,
+            updatedAt: newArticle.updatedAt,
+            favorited: newArticle.favorited,
+            favoritesCount: newArticle.favoritesCount,
+            author: newArticle.author,
+        }
     } catch (err) {
         return err
     }

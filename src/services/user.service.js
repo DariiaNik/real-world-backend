@@ -1,6 +1,6 @@
 const {findOneUser, findOneUserAndUpdate} = require('../repositories/user.repository')
-const {updateManyArticles} = require('../services/article.service')
-const {updateManyComments} = require('../services/comment.service')
+const {updateManyArticles} = require('../repositories/article.repository')
+const {updateManyComments} = require('../repositories/comment.repository')
 
 const getUserService = async (token, id) => {
     try {
@@ -15,7 +15,7 @@ const getUserService = async (token, id) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 
@@ -31,7 +31,7 @@ const getProfileService = async (username, id) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 
@@ -65,7 +65,7 @@ const updateUserService = async (reqUser, token, id) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 
@@ -87,7 +87,7 @@ const followProfileService = async (username, id) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 
@@ -109,7 +109,7 @@ const unFollowProfileService = async (username, id) => {
             },
         }
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 

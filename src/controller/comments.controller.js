@@ -10,8 +10,7 @@ const getComments = async (req, res) => {
         const comments = await getCommentsService(slug)
         res.status(200).send(comments)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -23,8 +22,7 @@ const createComment = async (req, res) => {
         const newComment = await createCommentService(slug, comment, id)
         res.status(200).send(newComment)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -35,8 +33,7 @@ const deleteComment = async (req, res) => {
         const message = await deleteCommentService(slug, id)
         res.status(200).send(message)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 

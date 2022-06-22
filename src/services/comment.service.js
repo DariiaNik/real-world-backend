@@ -10,7 +10,7 @@ const getCommentsService = async (slug) => {
         const comments = await findManyComments({slug: slug}, {_id: 0, slug: 0, __v: 0})
         return {comments: comments}
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 const deleteCommentService = async (slug, id) => {
@@ -21,7 +21,7 @@ const deleteCommentService = async (slug, id) => {
         })
         return {message: 'Comment was deleted successfuly'}
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 
@@ -42,7 +42,7 @@ const createCommentService = async (slug, body, id) => {
         })
         return comment
     } catch (err) {
-        return err
+        throw new Error(err)
     }
 }
 

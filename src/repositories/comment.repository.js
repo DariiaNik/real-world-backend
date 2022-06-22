@@ -17,14 +17,6 @@ const findManyComments = async (query, options) => {
     }
 }
 
-const findOneComment = async (query, options) => {
-    try {
-        return await Comment.findOne(query, options)
-    } catch (err) {
-        return err
-    }
-}
-
 const findOneCommentAndDelete = async (query, options) => {
     try {
         return await Comment.findOneAndDelete(query, options)
@@ -46,7 +38,6 @@ const createNewComment = async (newComment) => {
 module.exports = {
     updateManyComments,
     findManyComments,
-    findOneComment,
     findOneCommentAndDelete,
     createNewComment,
 }

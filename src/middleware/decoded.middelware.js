@@ -7,7 +7,6 @@ const decodedToken = async (req, res, next) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
             res.locals.token = decoded.id
         } catch (err) {
-            console.error(err)
             res.status(401).send({error: 'Unauthorized'})
         }
     }

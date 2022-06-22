@@ -17,8 +17,7 @@ const getAllArticles = async (req, res) => {
         const articles = await getAllArticlesService(id, query)
         res.status(200).send(articles)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -29,8 +28,7 @@ const getArticleBySlug = async (req, res) => {
         const article = await getArticleBySlugService(slug, id)
         res.status(200).send(article)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -41,8 +39,7 @@ const getFeedArticles = async (req, res) => {
         const articles = await getFeedArticlesService(id, query)
         res.status(200).send(articles)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -53,8 +50,7 @@ const createArticle = async (req, res) => {
         const article = await createArticleService(id, reqArticle)
         res.status(200).send(article)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -64,8 +60,7 @@ const deleteArticle = async (req, res) => {
         const message = await deleteArticleService(slug)
         res.status(200).send(message)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -76,8 +71,7 @@ const updateArticle = async (req, res) => {
         const article = await updateArticleService(slug, reqArticle)
         res.status(200).send(article)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -88,8 +82,7 @@ const favoriteArticle = async (req, res) => {
         const article = await favoriteArticleService(slug, id)
         res.status(200).send(article)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -100,8 +93,7 @@ const unFavoriteArticle = async (req, res) => {
         const article = await unFavoriteArticleService(slug, id)
         res.status(200).send(article)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 
@@ -110,8 +102,7 @@ const getTags = async (req, res) => {
         const tags = await getTagsService()
         res.status(200).send(tags)
     } catch (err) {
-        console.error(err)
-        res.status(500).send({error: err})
+        res.status(500).send(err.message)
     }
 }
 

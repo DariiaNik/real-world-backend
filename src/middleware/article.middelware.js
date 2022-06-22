@@ -14,7 +14,6 @@ const checkArticleTitleExist = async (req, res, next) => {
         }
         next()
     } catch (err) {
-        console.error(err)
         res.status(500).send({error: err})
     }
 }

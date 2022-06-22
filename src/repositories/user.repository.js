@@ -19,7 +19,13 @@ const findOneUserAndUpdate = async (query, update, options) => {
 
 const createNewUser = async (user) => {
     try {
-        return await new User(user).save()
+        let newUser = await new User(user).save()
+        return {
+            username: newUser.username,
+            email: newUser.email,
+            image: newUser.image,
+            bio: newUser.bio,
+        }
     } catch (err) {
         return err
     }

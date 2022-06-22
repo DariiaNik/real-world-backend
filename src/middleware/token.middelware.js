@@ -11,7 +11,6 @@ const verifyToken = async (req, res, next) => {
         })
         res.locals.token = decoded.id
     } catch (err) {
-        console.error(err)
         res.status(401).send({error: 'Unauthorize'})
     }
     next()

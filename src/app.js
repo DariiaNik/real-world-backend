@@ -2,7 +2,6 @@ const express = require('express')
 const cors = require('cors')
 const db = require('./models')
 
-const port = process.env.SERVER_PORT || 3000
 const app = express()
 
 app.use(cors())
@@ -24,6 +23,4 @@ db.mongoose
     })
     .catch((err) => console.error('Connection to mongoDB failed', err))
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+module.exports = app

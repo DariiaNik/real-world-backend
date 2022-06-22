@@ -4,8 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "node -r dotenv/config src/app.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node -r dotenv/config src/server.js",
+        "test": "jest --runInBand",
         "lint": "npx eslint src",
         "lint:fix": "npm run lint -- --fix",
         "prettier": "npx prettier src --check",
@@ -22,12 +22,15 @@
         "express": "^4.18.1",
         "jsonwebtoken": "^8.5.1",
         "mongoose": "^6.3.4",
-        "prettier": "^2.6.2"
+        "prettier": "^2.6.2",
+        "supertest": "^6.2.3"
     },
     "devDependencies": {
+        "@shelf/jest-mongodb": "^3.0.1",
         "eslint": "^8.17.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-prettier": "^8.5.0",
-        "eslint-plugin-import": "^2.26.0"
+        "eslint-plugin-import": "^2.26.0",
+        "jest": "^28.1.1"
     }
 }
