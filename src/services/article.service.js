@@ -1,4 +1,4 @@
-const {findOneUser} = require('../repositories/user.repository')
+const {findOneUser, findUsers} = require('../repositories/user.repository')
 const {
     createNewArticle,
     getAllTags,
@@ -66,11 +66,16 @@ const getArticleBySlugService = async (slug, id) => {
 }
 const getFeedArticlesService = async (id, reqQuery) => {
     try {
-        const user = await findOneUser({
+        let usernames = []
+        await findUsers({
             followingBy: {$in: id},
+        }).then((users) => {
+            users.forEach((user) => {
+                usernames.push(user.username)
+            })
         })
         const query = {
-            'author.username': user.username,
+            'author.username': {$in: usernames},
         }
         const count = await CountArticles(query)
         const articles = await findManyArticles(query, {_id: 0, __v: 0}, reqQuery)

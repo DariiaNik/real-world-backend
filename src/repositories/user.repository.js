@@ -9,6 +9,14 @@ const findOneUser = async (query) => {
     }
 }
 
+const findUsers = async (query) => {
+    try {
+        return await User.find(query)
+    } catch (err) {
+        return err
+    }
+}
+
 const findOneUserAndUpdate = async (query, update, options) => {
     try {
         return await User.findOneAndUpdate(query, update, options)
@@ -32,6 +40,7 @@ const createNewUser = async (user) => {
 }
 module.exports = {
     findOneUser,
+    findUsers,
     createNewUser,
     findOneUserAndUpdate,
 }
