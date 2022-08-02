@@ -37,7 +37,7 @@ const getProfileService = async (username, id) => {
 
 const updateUserService = async (reqUser, token, id) => {
     try {
-        const user = await findOneUser({id: id})
+        const user = await findOneUser({_id: id})
         const update = {
             'author.username': reqUser.username,
             'author.bio': reqUser.bio,
