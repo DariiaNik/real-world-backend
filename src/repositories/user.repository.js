@@ -33,6 +33,7 @@ const createNewUser = async (user) => {
             email: newUser.email,
             image: newUser.image,
             bio: newUser.bio,
+            _id: newUser._id,
         }
     } catch (err) {
         return err
